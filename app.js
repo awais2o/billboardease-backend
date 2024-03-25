@@ -1,10 +1,12 @@
+require('dotenv').config()
+
 const express = require('express')
 const connection = require('./Database/connect')
 const parser = require('body-parser')
 const cors = require('cors')
 const authRoute = require('./Route/AuthRoute')
 const App = express()
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT
 App.use(cors())
 App.get('/', (req, res) => {
   res.json({ message: 'Server is running' })

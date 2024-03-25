@@ -40,7 +40,9 @@ const register = async (req, res) => {
             name: user.name,
             cnic: user.cnic,
             email: user.email,
-            phone_number: user.phone_number
+            phone_number: user.phone_number,
+            created_at: user.created_at,
+            status: user.status
           }
           let token = jwt.sign(tokenPayload, process.env.SECRET_KEY)
           res.header('Authorization', `Bearer ${token}`)
