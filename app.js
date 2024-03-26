@@ -5,6 +5,8 @@ const connection = require('./Database/connect')
 const parser = require('body-parser')
 const cors = require('cors')
 const authRoute = require('./Route/AuthRoute')
+const mediaRoute = require('./Route/MediaRoute')
+
 const App = express()
 const PORT = process.env.PORT
 App.use(cors())
@@ -13,6 +15,7 @@ App.get('/', (req, res) => {
 })
 App.use(parser.json())
 App.use('/auth', authRoute)
+App.use('/media', mediaRoute)
 const start = async () => {
   const connect = await connection()
   connect.end()
