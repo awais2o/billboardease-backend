@@ -1,98 +1,162 @@
-const connect = require("../Database/connect");
+const connection = require('../Database/connect')
+
+// Function to execute SQL queries with promise support
+const query = (sql, params) => {
+  return new Promise((resolve, reject) => {
+    const db = connection() // Initialize the database connection
+    db.query(sql, params, (error, results) => {
+      if (error) {
+        db.end() // Make sure to end the connection when an error occurs
+        reject(error)
+        return
+      }
+      db.end() // End the connection after the query has been executed
+      resolve(results)
+    })
+  })
+}
 
 // Add a new billboard
-const addBillboard = async (req, res) => {
-  const db = await connect();
+exports.addBillboard = async (req, res) => {
   const {
     location_address,
     longitude,
     latitude,
     dimension_x,
     dimension_y,
-    tag,
-  } = req.body;
+    tag
+  } = req.body
   try {
-    // First, insert the new billboard
-    const insertResult = await db.query(
-      "INSERT INTO billboard (location_address, longitude, latitude, dimension_x, dimension_y, tag) VALUES (?, ?, ?, ?, ?, ?)",
+    const insertResult = await query(
+      'INSERT INTO billboard (location_address, longitude, latitude, dimension_x, dimension_y, tag) VALUES (?, ?, ?, ?, ?, ?)',
       [location_address, longitude, latitude, dimension_x, dimension_y, tag]
-    );
+    )
 
-    // Then, fetch the newly created billboard using the insertId
-    const newBillboardId = insertResult.insertId;
-    const [newBillboard] = await db.query(
-      "SELECT * FROM billboard WHERE id = ?",
-      [newBillboardId]
-    );
+    // Fetching the newly added billboard to return it
+    const newBillboard = await query(
+      'SELECT * FROM billboard WHERE billboard_id = ?',
+      [insertResult.insertId]
+    )
 
-    // Finally, send the new billboard object in the response
     res.status(201).json({
-      message: "Billboard added successfully",
-      billboard: newBillboard,
-    });
+      message: 'Billboard added successfully',
+      billboard: newBillboard.length > 0 ? newBillboard[0] : null // Ensure there's a billboard to return
+    })
   } catch (err) {
-    res.status(500).send("Error adding billboard");
-    console.error(err);
+    console.error('Error adding billboard:', err)
+    res
+      .status(500)
+      .json({ message: 'Error adding billboard', error: err.message }) // Respond with JSON for consistency
   }
-};
+}
 
-// Get all billboards
-const getAllBillboards = async (req, res) => {
+exports.getAllBillboards = async (req, res) => {
   try {
-    const result = await db.query("SELECT * FROM billboard");
-    res.status(200).json(result);
+    const result = await query('SELECT * FROM billboard', [])
+    res.status(200).json({
+      message: 'Billboards retrieved successfully',
+      billboards: result
+    })
   } catch (err) {
-    res.status(500).send("Error retrieving billboards");
-    console.error(err);
+    console.error('Error retrieving billboards:', err)
+    res
+      .status(500)
+      .json({ message: 'Error retrieving billboards', error: err.message })
   }
-};
+}
 
-// Update a billboard
-const updateBillboard = async (req, res) => {
+exports.getBillboardById = async (req, res) => {
+  const id = req.params.id // Access the ID provided in the route
+
+  try {
+    const result = await query(
+      'SELECT * FROM billboard WHERE billboard_id = ?',
+      [id]
+    )
+    if (result.length > 0) {
+      res.status(200).json({
+        message: 'Billboard retrieved successfully',
+        billboard: result[0]
+      }) // Send the found billboard in JSON format
+    } else {
+      res.status(404).json({ message: 'Billboard not found' }) // Respond with JSON for consistency
+    }
+  } catch (err) {
+    console.error('Error retrieving billboard:', err)
+    res
+      .status(500)
+      .json({ message: 'Error retrieving billboard', error: err.message })
+  }
+}
+
+exports.updateBillboard = async (req, res) => {
+  const { id } = req.params // Extracting the ID from the URL path
   const {
-    id,
     location_address,
     longitude,
     latitude,
     dimension_x,
     dimension_y,
-    tag,
-  } = req.body;
+    tag
+  } = req.body
+
   try {
-    const result = await db.query(
-      "UPDATE billboard SET location_address = ?, longitude = ?, latitude = ?, dimension_x = ?, dimension_y = ?, tag = ? WHERE id = ?",
+    // Perform the update operation
+    const updateResult = await query(
+      'UPDATE billboard SET location_address = ?, longitude = ?, latitude = ?, dimension_x = ?, dimension_y = ?, tag = ? WHERE billboard_id = ?',
       [location_address, longitude, latitude, dimension_x, dimension_y, tag, id]
-    );
-    if (result.affectedRows > 0) {
-      res.send("Billboard updated successfully.");
+    )
+
+    // Check if the billboard was successfully updated
+    if (updateResult.affectedRows > 0) {
+      // Fetch the updated billboard
+      const [updatedBillboards] = await query(
+        'SELECT * FROM billboard WHERE billboard_id = ?',
+        [id]
+      )
+
+      // Return the updated billboard data
+      if (updatedBillboards.length > 0) {
+        res.status(200).json({
+          message: 'Billboard updated successfully.',
+          billboard: updatedBillboards[0]
+        })
+      } else {
+        // In case the billboard cannot be found after update (highly unlikely unless concurrent deletions)
+        res.status(404).json({ message: 'Updated billboard not found.' })
+      }
     } else {
-      res.status(404).send("Billboard not found.");
+      res.status(404).json({ message: 'Billboard not found.' })
     }
   } catch (err) {
-    res.status(500).send("Error updating billboard");
-    console.error(err);
+    console.error('Error updating billboard:', err)
+    res
+      .status(500)
+      .json({ message: 'Error updating billboard', error: err.message })
   }
-};
+}
+exports.deleteBillboard = async (req, res) => {
+  const { id } = req.params // Extracting the ID from the URL path
 
-// Delete a billboard
-const deleteBillboard = async (req, res) => {
-  const { id } = req.params;
   try {
-    const result = await db.query("DELETE FROM billboard WHERE id = ?", [id]);
-    if (result.affectedRows > 0) {
-      res.send("Billboard deleted successfully.");
+    const deleteResult = await query(
+      'DELETE FROM billboard WHERE billboard_id = ?',
+      [id]
+    )
+
+    // Check if the billboard was successfully deleted
+    if (deleteResult.affectedRows > 0) {
+      res.json({
+        message: 'Billboard deleted successfully',
+        deletedBillboardId: id
+      })
     } else {
-      res.status(404).send("Billboard not found.");
+      res.status(404).json({ message: 'Billboard not found' })
     }
   } catch (err) {
-    res.status(500).send("Error deleting billboard");
-    console.error(err);
+    console.error('Error deleting billboard:', err)
+    res
+      .status(500)
+      .json({ message: 'Error deleting billboard', error: err.message })
   }
-};
-
-module.exports = {
-  addBillboard,
-  getAllBillboards,
-  updateBillboard,
-  deleteBillboard,
-};
+}
