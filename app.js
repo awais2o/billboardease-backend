@@ -6,6 +6,7 @@ const parser = require('body-parser')
 const cors = require('cors')
 const authRoute = require('./Route/AuthRoute')
 const mediaRoute = require('./Route/MediaRoute')
+const contentRoute = require('./Route/ContentRoute')
 const billboardRoute = require('./Route/BillboardRoute')
 
 const App = express()
@@ -18,7 +19,7 @@ App.use(parser.json())
 App.use('/auth', authRoute)
 App.use('/media', mediaRoute)
 App.use('/billboard', billboardRoute)
-
+App.use('/content', contentRoute)
 const start = async () => {
   const connect = await connection()
   connect.end()
