@@ -17,10 +17,13 @@ const query = (sql, params) => {
 // Middleware to verify token and check user type
 const verifyAccess = allowedUserTypes => async (req, res, next) => {
   const authHeader = req.headers.authorization
+  console.log('HEaer', authHeader)
   if (authHeader) {
     const token = authHeader.split(' ')[1] // Assuming "Bearer TOKEN_STRING"
-
+    // console.log(token)
+    // console.log(process.env.SECRET_KEY)
     jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
+      // console.log(decoded)
       if (err) {
         console.log(err)
         return res.status(403).json({ message: 'Token is not valid' })

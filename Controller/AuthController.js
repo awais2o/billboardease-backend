@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt')
 const saltRounds = 10 // This is the cost factor for hashing the password.
 
 const register = async (req, res) => {
+  console.log('Registered Request Recieved')
   const { cnic, password } = req.body
 
   try {
@@ -89,7 +90,7 @@ const login = async (req, res) => {
             status: user.status
           }
 
-          const tokenPayload = { user_id: user.user_id }
+          const tokenPayload = { user_id: user.user_id,  }
           const token = jwt.sign(tokenPayload, process.env.SECRET_KEY) // Customize token expiration as needed
 
           // Send the token in both the Authorization header and the response body
