@@ -87,10 +87,11 @@ const login = async (req, res) => {
             email: user.email,
             phone_number: user.phone_number,
             created_at: user.created_at,
+            role: user.usertype_id,
             status: user.status
           }
 
-          const tokenPayload = { user_id: user.user_id,  }
+          const tokenPayload = { user_id: user.user_id }
           const token = jwt.sign(tokenPayload, process.env.SECRET_KEY) // Customize token expiration as needed
 
           // Send the token in both the Authorization header and the response body

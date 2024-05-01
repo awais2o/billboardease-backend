@@ -18,18 +18,28 @@ const query = (sql, params) => {
 
 // Add a new billboard
 exports.addBillboard = async (req, res) => {
+  console.log(req)
   const {
+    title,
     location_address,
     longitude,
     latitude,
     dimension_x,
     dimension_y,
-    tag
+    tag_id
   } = req.body
   try {
     const insertResult = await query(
-      'INSERT INTO billboard (location_address, longitude, latitude, dimension_x, dimension_y, tag) VALUES (?, ?, ?, ?, ?, ?)',
-      [location_address, longitude, latitude, dimension_x, dimension_y, tag]
+      'INSERT INTO billboard (title,location_address, longitude, latitude, dimension_x, dimension_y, tag_id) VALUES (?,?, ?, ?, ?, ?, ?)',
+      [
+        title,
+        location_address,
+        longitude,
+        latitude,
+        dimension_x,
+        dimension_y,
+        tag_id
+      ]
     )
 
     // Fetching the newly added billboard to return it
@@ -52,7 +62,10 @@ exports.addBillboard = async (req, res) => {
 
 exports.getAllBillboards = async (req, res) => {
   try {
-    const result = await query('SELECT * FROM billboard', [])
+    const result = await query(
+      'SELECT * FROM billboard ORDER BY billboard_id DESC',
+      []
+    )
     res.status(200).json({
       message: 'Billboards retrieved successfully',
       billboards: result
@@ -92,21 +105,31 @@ exports.getBillboardById = async (req, res) => {
 exports.updateBillboard = async (req, res) => {
   const { id } = req.params // Extracting the ID from the URL path
   const {
+    title,
     location_address,
     longitude,
     latitude,
     dimension_x,
     dimension_y,
-    tag
+    tag_id: tag
   } = req.body
 
   try {
     // Perform the update operation
     const updateResult = await query(
-      'UPDATE billboard SET location_address = ?, longitude = ?, latitude = ?, dimension_x = ?, dimension_y = ?, tag = ? WHERE billboard_id = ?',
-      [location_address, longitude, latitude, dimension_x, dimension_y, tag, id]
+      'UPDATE billboard SET title = ?, location_address = ?, longitude = ?, latitude = ?, dimension_x = ?, dimension_y = ?, tag_id = ? WHERE billboard_id = ?',
+      [
+        title,
+        location_address,
+        longitude,
+        latitude,
+        dimension_x,
+        dimension_y,
+        tag,
+        id
+      ]
     )
-
+    console.log(updateResult)
     // Check if the billboard was successfully updated
     if (updateResult.affectedRows > 0) {
       // Fetch the updated billboard
@@ -114,12 +137,13 @@ exports.updateBillboard = async (req, res) => {
         'SELECT * FROM billboard WHERE billboard_id = ?',
         [id]
       )
+      console.log('updated', updatedBillboards)
 
       // Return the updated billboard data
-      if (updatedBillboards.length > 0) {
+      if (updatedBillboards) {
         res.status(200).json({
           message: 'Billboard updated successfully.',
-          billboard: updatedBillboards[0]
+          billboard: updatedBillboards
         })
       } else {
         // In case the billboard cannot be found after update (highly unlikely unless concurrent deletions)
