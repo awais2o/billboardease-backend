@@ -61,6 +61,7 @@ const register = async (req, res) => {
 }
 
 const login = async (req, res) => {
+  console.log('hi')
   const { cnic, password } = req.body
 
   try {
@@ -100,9 +101,11 @@ const login = async (req, res) => {
             .status(200)
             .json({ ...responseBody, token: `Bearer ${token}` })
         } else {
+          console.log('invalid cred')
           return res.status(401).json({ error: 'Invalid credentials' })
         }
       } else {
+        console.log('Not')
         return res.status(404).json({ error: 'User not found' })
       }
     })

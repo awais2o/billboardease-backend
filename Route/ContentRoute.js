@@ -16,8 +16,8 @@ router.get('/', verifyAccess([1, 2]), getAllContents)
 
 router.get('/:id', verifyAccess([1, 2]), getContentById)
 
-router.put('/:id', verifyAccess([1]), updateContent)
+router.put('/:id', verifyAccess([1, 2]), updateContent)
 
-router.delete('/:id', verifyAccess([1]), deleteContent)
+router.delete('/:id', verifyAccess([1, 2]), deleteContent)
 
 module.exports = router

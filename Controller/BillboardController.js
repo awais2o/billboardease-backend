@@ -18,7 +18,6 @@ const query = (sql, params) => {
 
 // Add a new billboard
 exports.addBillboard = async (req, res) => {
-  console.log(req)
   const {
     title,
     location_address,
@@ -26,11 +25,14 @@ exports.addBillboard = async (req, res) => {
     latitude,
     dimension_x,
     dimension_y,
-    tag_id
+    image,
+    tag_id,
+    baseprice,
+    quantity
   } = req.body
   try {
     const insertResult = await query(
-      'INSERT INTO billboard (title,location_address, longitude, latitude, dimension_x, dimension_y, tag_id) VALUES (?,?, ?, ?, ?, ?, ?)',
+      'INSERT INTO billboard (title, location_address, longitude, latitude, dimension_x, dimension_y, image, tag_id, baseprice, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         title,
         location_address,
@@ -38,7 +40,10 @@ exports.addBillboard = async (req, res) => {
         latitude,
         dimension_x,
         dimension_y,
-        tag_id
+        image,
+        tag_id,
+        baseprice,
+        quantity
       ]
     )
 
@@ -50,13 +55,13 @@ exports.addBillboard = async (req, res) => {
 
     res.status(201).json({
       message: 'Billboard added successfully',
-      billboard: newBillboard.length > 0 ? newBillboard[0] : null // Ensure there's a billboard to return
+      billboard: newBillboard.length > 0 ? newBillboard[0] : null
     })
   } catch (err) {
     console.error('Error adding billboard:', err)
     res
       .status(500)
-      .json({ message: 'Error adding billboard', error: err.message }) // Respond with JSON for consistency
+      .json({ message: 'Error adding billboard', error: err.message })
   }
 }
 
@@ -103,7 +108,7 @@ exports.getBillboardById = async (req, res) => {
 }
 
 exports.updateBillboard = async (req, res) => {
-  const { id } = req.params // Extracting the ID from the URL path
+  const { id } = req.params
   const {
     title,
     location_address,
@@ -111,13 +116,15 @@ exports.updateBillboard = async (req, res) => {
     latitude,
     dimension_x,
     dimension_y,
-    tag_id: tag
+    image,
+    tag_id: tag,
+    baseprice,
+    quantity
   } = req.body
 
   try {
-    // Perform the update operation
     const updateResult = await query(
-      'UPDATE billboard SET title = ?, location_address = ?, longitude = ?, latitude = ?, dimension_x = ?, dimension_y = ?, tag_id = ? WHERE billboard_id = ?',
+      'UPDATE billboard SET title = ?, location_address = ?, longitude = ?, latitude = ?, dimension_x = ?, dimension_y = ?, image = ?, tag_id = ?, baseprice = ?, quantity = ? WHERE billboard_id = ?',
       [
         title,
         location_address,
@@ -125,11 +132,14 @@ exports.updateBillboard = async (req, res) => {
         latitude,
         dimension_x,
         dimension_y,
+        image,
         tag,
+        baseprice,
+        quantity,
         id
       ]
     )
-    console.log(updateResult)
+
     // Check if the billboard was successfully updated
     if (updateResult.affectedRows > 0) {
       // Fetch the updated billboard
@@ -137,7 +147,6 @@ exports.updateBillboard = async (req, res) => {
         'SELECT * FROM billboard WHERE billboard_id = ?',
         [id]
       )
-      console.log('updated', updatedBillboards)
 
       // Return the updated billboard data
       if (updatedBillboards) {
@@ -146,7 +155,6 @@ exports.updateBillboard = async (req, res) => {
           billboard: updatedBillboards
         })
       } else {
-        // In case the billboard cannot be found after update (highly unlikely unless concurrent deletions)
         res.status(404).json({ message: 'Updated billboard not found.' })
       }
     } else {
@@ -159,6 +167,7 @@ exports.updateBillboard = async (req, res) => {
       .json({ message: 'Error updating billboard', error: err.message })
   }
 }
+
 exports.deleteBillboard = async (req, res) => {
   const { id } = req.params // Extracting the ID from the URL path
 

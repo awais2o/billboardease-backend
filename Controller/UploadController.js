@@ -40,4 +40,18 @@ const uploadFile = (req, res) => {
   })
 }
 
-module.exports = { uploadFile }
+const getImageURL = (req, res) => {
+  const filename = req.params.file // Extract filename from route parameter
+  const filePath = path.join(mediaDir, filename)
+
+  // Check if the file exists
+  if (fs.existsSync(filePath)) {
+    // Construct the URL based on your server configuration
+    const imageURL = `http://${req.headers.host}/media/${filename}`
+    res.json({ imageURL })
+  } else {
+    res.status(404).json({ error: 'Image not found' })
+  }
+}
+
+module.exports = { uploadFile, getImageURL }
