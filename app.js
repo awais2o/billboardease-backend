@@ -12,6 +12,8 @@ const billboardRoute = require('./Route/BillboardRoute')
 const tagroute = require('./Route/TagRoute')
 const AllUsersroute = require('./Route/AllUsers')
 const wishlistRoute = require('./Route/WishlistRoute') // Adjust the path as necessary
+const proceedingRoute = require('./Route/ProceedingRoute') // Adjust the path as necessary
+
 const biddingSocket = require('./Sockets/biddingSocket') // Import the new WebSocket file
 
 const app = express()
@@ -20,6 +22,8 @@ const server = http.createServer(app)
 const PORT = process.env.PORT
 const corsOptions = {
   origin: 'http://localhost:3000', // Allow only your front-end origin
+  // origin: 'http://192.168.100.136:3000', // Allow only your front-end origin
+
   credentials: true, // Allow cookies and sessions
   optionsSuccessStatus: 200 // Legacy browsers (IE11, various SmartTVs) choke on 204
 }
@@ -34,6 +38,7 @@ app.use('/content', contentRoute)
 app.use('/tags', tagroute)
 app.use('/allusers', AllUsersroute)
 app.use('/wishlist', wishlistRoute)
+app.use('/proceed', proceedingRoute)
 
 app.get('/', (req, res) => {
   res.json({ message: 'Server is running' })
