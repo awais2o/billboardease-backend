@@ -109,6 +109,51 @@ exports.attachContentToBid = async (req, res) => {
     db.end() // Close the database connection
   }
 }
+exports.getUpcomingOrdersForUser = async (req, res) => {
+  try {
+    const userId = getUserIdFromToken(req.headers.authorization) // Extract user_id from the JWT token
+
+    const queryText = `
+          SELECT 
+              o.order_id, 
+              b.forDateTime, 
+              u.name, 
+              o.paid, 
+              bb.title,
+              b.bidAmount
+          FROM 
+              \`order\` AS o 
+              INNER JOIN bid AS b ON o.bid_id = b.bid_id
+              INNER JOIN user AS u ON b.user_id = u.user_id
+              INNER JOIN billboard AS bb ON b.billboard_id = bb.billboard_id
+          WHERE 
+              u.user_id = ? AND 
+              b.forDateTime > NOW()
+              
+          ORDER BY 
+              b.forDateTime ASC;
+      `
+
+    const results = await query(queryText, [userId])
+    if (results.length > 0) {
+      res.status(200).json({
+        message: 'Upcoming orders retrieved successfully',
+        orders: results
+      })
+    } else {
+      res.status(404).json({
+        message: 'No upcoming orders found'
+      })
+    }
+  } catch (err) {
+    console.error('Error retrieving upcoming orders:', err)
+    res.status(500).json({
+      message: 'Error retrieving upcoming orders',
+      error: err.message
+    })
+  }
+}
+
 exports.getUpcomingOrderDetails = async (req, res) => {
   try {
     const queryText = `

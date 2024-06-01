@@ -13,7 +13,7 @@ const tagroute = require('./Route/TagRoute')
 const AllUsersroute = require('./Route/AllUsers')
 const wishlistRoute = require('./Route/WishlistRoute') // Adjust the path as necessary
 const proceedingRoute = require('./Route/ProceedingRoute') // Adjust the path as necessary
-
+const paymentRoute = require('./Route/PaymentRoute')
 const biddingSocket = require('./Sockets/biddingSocket') // Import the new WebSocket file
 
 const app = express()
@@ -21,7 +21,11 @@ const server = http.createServer(app)
 
 const PORT = process.env.PORT
 const corsOptions = {
-  origin: 'http://localhost:3000', // Allow only your front-end origin
+  origin: [
+    'http://localhost:3000', // Your frontend during development
+    'https://sandbox.jazzcash.com.pk', // JazzCash sandbox environment
+    'https://payments.jazzcash.com.pk' // JazzCash live environment
+  ], // Allow only your front-end origin
   // origin: 'http://192.168.100.136:3000', // Allow only your front-end origin
 
   credentials: true, // Allow cookies and sessions
@@ -39,6 +43,7 @@ app.use('/tags', tagroute)
 app.use('/allusers', AllUsersroute)
 app.use('/wishlist', wishlistRoute)
 app.use('/proceed', proceedingRoute)
+app.use('/payment', paymentRoute) // Use the new payment route
 
 app.get('/', (req, res) => {
   res.json({ message: 'Server is running' })

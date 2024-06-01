@@ -5,7 +5,8 @@ const {
   getMyWinnings,
   attachContentToBid,
   getUpcomingOrderDetails,
-  approveContent
+  approveContent,
+  getUpcomingOrdersForUser
 } = require('../Controller/ProceedController')
 
 const router = express.Router()
@@ -14,6 +15,8 @@ const router = express.Router()
 // router.post('/uploadfile', verifyAccess([1, 2]), uploadFile)
 router.get('/mywinnings', verifyAccess([2]), getMyWinnings)
 router.post('/attach-content', verifyAccess([2]), attachContentToBid)
+router.get('/willtopay', verifyAccess([2]), getUpcomingOrdersForUser)
+
 router.get('/allcontent', verifyAccess([1]), getUpcomingOrderDetails)
 router.post('/approve-content', verifyAccess([1]), approveContent)
 router.post('/disapprove-content', verifyAccess([1]), approveContent)
