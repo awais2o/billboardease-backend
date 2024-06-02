@@ -1,13 +1,13 @@
 const mysql = require('mysql')
 const connectTo = {
-  // host: 'brqyaklabyurutynaewk-mysql.services.clever-cloud.com',
-  // user: 'umrzqlj3mf9iajt0',
-  // password: 'hZobZNY343MojJeUX6nS',
-  // database: 'brqyaklabyurutynaewk'
-  host:'127.0.0.1',
-  user:'root',
-  password:'',
-  database:'billboardease'
+  host: 'brqyaklabyurutynaewk-mysql.services.clever-cloud.com',
+  user: 'umrzqlj3mf9iajt0',
+  password: 'hZobZNY343MojJeUX6nS',
+  database: 'brqyaklabyurutynaewk'
+  // host:'127.0.0.1',
+  // user:'root',
+  // password:'',
+  // database:'billboardease'
 
 }
 

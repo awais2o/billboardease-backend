@@ -24,7 +24,9 @@ const corsOptions = {
   origin: [
     'http://localhost:3000', // Your frontend during development
     'https://sandbox.jazzcash.com.pk', // JazzCash sandbox environment
-    'https://payments.jazzcash.com.pk' // JazzCash live environment
+    'https://payments.jazzcash.com.pk',
+    '192.168.100.136:3000'
+    // JazzCash live environment
   ], // Allow only your front-end origin
   // origin: 'http://192.168.100.136:3000', // Allow only your front-end origin
 
