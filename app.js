@@ -15,6 +15,7 @@ const wishlistRoute = require('./Route/WishlistRoute') // Adjust the path as nec
 const proceedingRoute = require('./Route/ProceedingRoute') // Adjust the path as necessary
 const paymentRoute = require('./Route/PaymentRoute')
 const biddingSocket = require('./Sockets/biddingSocket') // Import the new WebSocket file
+const bidRoute = require('./Route/BidRoute')
 
 const app = express()
 const server = http.createServer(app)
@@ -40,6 +41,7 @@ app.use('/allusers', AllUsersroute)
 app.use('/wishlist', wishlistRoute)
 app.use('/proceed', proceedingRoute)
 app.use('/payment', paymentRoute) // Use the new payment route
+app.use('/bid', bidRoute)
 
 app.get('/', (req, res) => {
   res.json({ message: 'Server is running' })
