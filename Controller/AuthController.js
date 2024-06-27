@@ -115,4 +115,64 @@ const login = async (req, res) => {
   }
 }
 
-module.exports = { register, login }
+const getUserById = async (req, res) => {
+  const { user_id } = req.params
+
+  try {
+    const connect = await connection()
+    let query =
+      'SELECT user_id, name, email, cnic, phone_number, created_at, status, usertype_id FROM user WHERE user_id = ?'
+
+    connect.query(query, [user_id], (err, results) => {
+      if (err) {
+        console.error('Error fetching user:', err)
+        return res.status(500).json({ error: 'Internal server error' })
+      }
+
+      if (results.length > 0) {
+        return res.status(200).json(results[0])
+      } else {
+        return res.status(404).json({ error: 'User not found' })
+      }
+    })
+  } catch (error) {
+    console.error('Error during fetching user:', error)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+}
+
+const updateUserById = async (req, res) => {
+  const { user_id } = req.params
+  const { name, email, cnic, phone_number, status, usertype_id } = req.body
+
+  try {
+    const connect = await connection()
+    let query =
+      'UPDATE user SET name = ?, email = ?, cnic = ?, phone_number = ?, status = ?, usertype_id = ? WHERE user_id = ?'
+
+    connect.query(
+      query,
+      [name, email, cnic, phone_number, status, usertype_id, user_id],
+      (err, results) => {
+        if (err) {
+          if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ error: 'CNIC already exists' })
+          }
+          console.error('Error updating user:', err)
+          return res.status(500).json({ error: 'Internal server error' })
+        }
+
+        if (results.affectedRows > 0) {
+          return res.status(200).json({ message: 'User updated successfully' })
+        } else {
+          return res.status(404).json({ error: 'User not found' })
+        }
+      }
+    )
+  } catch (error) {
+    console.error('Error during updating user:', error)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+}
+
+module.exports = { register, login, getUserById, updateUserById }

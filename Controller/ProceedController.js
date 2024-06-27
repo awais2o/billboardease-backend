@@ -44,14 +44,18 @@ exports.getMyWinnings = async (req, res) => {
     twoDaysAhead.setSeconds(0)
     twoDaysAhead.setMilliseconds(0)
 
-    // Updated SQL query with JOIN to fetch title from billboard table
+    // Updated SQL query with an additional filter on forDateTime
     const queryText = `
-        SELECT b.bid_id, b.user_id, b.billboard_id, b.bidAmount, b.bidTime, b.forDateTime, b.isWinning, bb.title AS billboard_title
-        FROM bid b
-        INNER JOIN billboard bb ON b.billboard_id = bb.billboard_id
-        WHERE b.user_id = ? AND b.isWinning = 1 AND b.forDateTime <= ? AND b.finalize = 0
-      `
-
+      SELECT b.bid_id, b.user_id, b.billboard_id, b.bidAmount, b.bidTime, b.forDateTime, b.isWinning, bb.title AS billboard_title
+      FROM bid b
+      INNER JOIN billboard bb ON b.billboard_id = bb.billboard_id
+      WHERE b.user_id = ? 
+        AND b.isWinning = 1 
+        AND b.forDateTime < ?  
+        
+        AND b.finalize = 0
+    `
+    console.log({ twoDaysAhead })
     const results = await query(queryText, [userId, twoDaysAhead])
     res.status(200).json({
       message: 'Winning bids retrieved successfully',
@@ -65,6 +69,7 @@ exports.getMyWinnings = async (req, res) => {
     })
   }
 }
+
 // Controller function to attach content to a bid
 exports.attachContentToBid = async (req, res) => {
   const { bid_id, content_id } = req.body // Extracting bid_id and content_id from request body

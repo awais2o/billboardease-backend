@@ -25,12 +25,7 @@ const currentBids = {} // Object to store the current highest bid for each billb
 const biddingSocket = server => {
   const io = socketIo(server, {
     cors: {
-      origin: [
-        'http://localhost:3000', // Your frontend during development
-
-        'http://192.168.100.136'
-        // JazzCash live environment
-      ],
+      origin: '*',
       methods: ['GET', 'POST'],
       credentials: true
     }

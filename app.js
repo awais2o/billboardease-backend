@@ -16,6 +16,8 @@ const proceedingRoute = require('./Route/ProceedingRoute') // Adjust the path as
 const paymentRoute = require('./Route/PaymentRoute')
 const biddingSocket = require('./Sockets/biddingSocket') // Import the new WebSocket file
 const bidRoute = require('./Route/BidRoute')
+const displayRoute = require('./Route/DisplayRoute')
+const dashboardRoute = require('./Route/AdminDashboardRoute')
 
 const app = express()
 const server = http.createServer(app)
@@ -42,7 +44,8 @@ app.use('/wishlist', wishlistRoute)
 app.use('/proceed', proceedingRoute)
 app.use('/payment', paymentRoute) // Use the new payment route
 app.use('/bid', bidRoute)
-
+app.use('/display', displayRoute)
+app.use('/dashboard', dashboardRoute)
 app.get('/', (req, res) => {
   res.json({ message: 'Server is running' })
 })
