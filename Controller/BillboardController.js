@@ -28,11 +28,12 @@ exports.addBillboard = async (req, res) => {
     image,
     tag_id,
     baseprice,
-    quantity
+    quantity,
+    regular
   } = req.body
   try {
     const insertResult = await query(
-      'INSERT INTO billboard (title, location_address, longitude, latitude, dimension_x, dimension_y, image, tag_id, baseprice, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO billboard (title, location_address, longitude, latitude, dimension_x, dimension_y, image, tag_id, baseprice, quantity, regular) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         title,
         location_address,
@@ -43,7 +44,8 @@ exports.addBillboard = async (req, res) => {
         image,
         tag_id,
         baseprice,
-        quantity
+        quantity,
+        regular
       ]
     )
 
